@@ -2,18 +2,11 @@ package ru.job4j.pojo;
 
 public class Library {
 
-    public static Book newBook(String name, int pages) {
-        Book rsl = new Book();
-        rsl.setName(name);
-        rsl.setPages(pages);
-        return rsl;
-    }
-
     public static Book[] createBookArray() {
-        Book java12e = newBook("Java. A Complete Guide. 12th Edition", 1244);
-        Book sorcerersStone = newBook("Harry Potter and the Sorcerer's Stone", 368);
-        Book code = newBook("Clean Code", 464);
-        Book utopia = newBook("1984", 384);
+        Book java12e = new Book("Java. A Complete Guide. 12th Edition", 1244);
+        Book sorcerersStone = new Book("Harry Potter and the Sorcerer's Stone", 368);
+        Book code = new Book("Clean Code", 464);
+        Book utopia = new Book("1984", 384);
         return new Book[]{java12e, sorcerersStone, code, utopia};
     }
 
