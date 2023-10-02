@@ -15,10 +15,10 @@ public class Matches {
             int matches = Integer.parseInt(input.nextLine());
             if (matches < 1 || matches > 3 || matches > count) {
                 System.out.println("Неверное число. Допустимо вытаскивать от 1 до 3 спичек, но не более остатка");
-                continue;
+            } else {
+                count -= matches;
+                turn = !turn;
             }
-            count -= matches;
-            turn = !turn;
         }
         if (!turn) {
             System.out.println("Выиграл первый игрок");
