@@ -1,16 +1,16 @@
 package ru.job4j.tracker;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tracker {
-    private final Item[] items = new Item[100];
+    private final List<Item> items = new ArrayList<>();
     private int ids = 1;
-    private int size = 0;
 
     private int indexOf(int id) {
         int rsl = -1;
-        for (int i = 0; i < size; i++) {
-            if (items[i].getId() == id) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId() == id) {
                 rsl = i;
                 break;
             }
@@ -20,29 +20,27 @@ public class Tracker {
 
     public Item add(Item item) {
         item.setId(ids++);
-        items[size++] = item;
+        items.add(item);
         return item;
     }
 
     public Item findById(int id) {
         int idx = indexOf(id);
-        return idx >= 0 ? items[idx] : null;
+        return idx >= 0 ? items.get(idx) : null;
     }
 
-    public Item[] findAll() {
-        return Arrays.copyOf(items, size);
+    public List<Item> findAll() {
+        return new ArrayList<>(items);
     }
 
-    public Item[] findByName(String name) {
-        Item[] rsl = new Item[size];
-        int j = 0;
-        for (int i = 0; i < size; i++) {
-            if (name.equals(items[i].getName())) {
-                rsl[j] = items[i];
-                j++;
+    public List<Item> findByName(String name) {
+        List<Item> rsl = new ArrayList<>();
+        for (Item item : items) {
+            if (name.equals(item.getName())) {
+                rsl.add(item);
             }
         }
-        return Arrays.copyOf(rsl, j);
+        return rsl;
     }
 
     public boolean replace(int id, Item item) {
@@ -50,7 +48,7 @@ public class Tracker {
         boolean rsl = index != -1;
         if (rsl) {
             item.setId(id);
-            items[index] = item;
+            items.set(index, item);
         }
         return rsl;
     }
@@ -58,9 +56,7 @@ public class Tracker {
     public void delete(int id) {
         int idx = indexOf(id);
         if (idx != -1) {
-            System.arraycopy(items, idx + 1, items, idx, size - idx - 1);
-            items[size - 1] = null;
-            size--;
+            items.remove(idx);
         }
     }
 }
