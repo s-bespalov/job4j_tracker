@@ -28,11 +28,10 @@ public class ReconstructPhrase {
 
     private String getDescendingElements() {
         StringBuilder rsl = new StringBuilder();
-        Iterator<Character> iterator = descendingElements.descendingIterator();
-        while (iterator.hasNext()) {
-            rsl.append(iterator.next());
+        while (descendingElements.peekLast() != null) {
+            rsl.append(descendingElements.pollLast());
         }
-        return rsl.toString();
+        return  rsl.toString();
     }
 
     public String getReconstructPhrase() {
