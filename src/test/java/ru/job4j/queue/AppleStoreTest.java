@@ -39,4 +39,20 @@ class AppleStoreTest {
         String customer = appleStore.getFirstUpsetCustomer();
         assertThat(customer).isEqualTo("Iryna");
     }
+
+    @Test
+    void whenGetLastOnEmptyQueue() {
+        Queue<Customer> customers = new LinkedList<>();
+        AppleStore appleStore = new AppleStore(customers, 1);
+        String customer = appleStore.getLastHappyCustomer();
+        assertThat(customer).isNull();
+    }
+
+    @Test
+    void whenGetFirstOnEmptyQueue() {
+        Queue<Customer> customers = new LinkedList<>();
+        AppleStore appleStore = new AppleStore(customers, 1);
+        String customer = appleStore.getLastHappyCustomer();
+        assertThat(customer).isNull();
+    }
 }
