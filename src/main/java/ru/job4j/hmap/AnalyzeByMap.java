@@ -32,11 +32,7 @@ public class AnalyzeByMap {
         Map<String, Integer> subjects = new LinkedHashMap<>();
         for (Pupil pupil : pupils) {
             for (Subject subject : pupil.subjects()) {
-                Integer val = subjects.get(subject.name());
-                if (val == null) {
-                    val = 0;
-                }
-                subjects.put(subject.name(), val + subject.score());
+                subjects.put(subject.name(), subjects.getOrDefault(subject.name(), 0) + subject.score());
             }
         }
         for (Map.Entry<String, Integer> subject : subjects.entrySet()) {
@@ -46,34 +42,32 @@ public class AnalyzeByMap {
     }
 
     public static Label bestStudent(List<Pupil> pupils) {
-        LinkedList<Label> chart = new LinkedList<>();
+        Label rsl = null;
         for (Pupil pupil : pupils) {
             double sum = 0;
             for (Subject subject : pupil.subjects()) {
                 sum += subject.score();
             }
-            chart.add(new Label(pupil.name(), sum));
+            if (rsl == null || rsl.score() < sum) {
+                rsl = new Label(pupil.name(), sum);
+            }
         }
-        chart.sort(Comparator.naturalOrder());
-        return chart.getLast();
+        return rsl;
     }
 
     public static Label bestSubject(List<Pupil> pupils) {
-        LinkedList<Label> chart = new LinkedList<>();
+        Label rsl = null;
         Map<String, Integer> subjects = new LinkedHashMap<>();
         for (Pupil pupil : pupils) {
             for (Subject subject : pupil.subjects()) {
-                Integer val = subjects.get(subject.name());
-                if (val == null) {
-                    val = 0;
-                }
-                subjects.put(subject.name(), val + subject.score());
+                subjects.put(subject.name(), subjects.getOrDefault(subject.name(), 0) + subject.score());
             }
         }
         for (Map.Entry<String, Integer> subject : subjects.entrySet()) {
-            chart.add(new Label(subject.getKey(), subject.getValue()));
+            if (rsl == null || rsl.score() < subject.getValue()) {
+                rsl = new Label(subject.getKey(), subject.getValue());
+            }
         }
-        chart.sort(Comparator.naturalOrder());
-        return chart.getLast();
+        return rsl;
     }
 }
