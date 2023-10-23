@@ -2,8 +2,19 @@ package ru.job4j.bank;
 
 import java.util.Objects;
 
+/**
+ * Класс описывает модель пользователя банка
+ * @author Sergey Bespalov
+ * @version 1.0
+ */
 public class User {
+    /**
+     * Номер паспорта пользователя хранится в переменной типа String
+     */
     private String passport;
+    /**
+     * Имя пользователя хранится в переменной типа String
+     */
     private String username;
 
     public User(String passport, String username) {
