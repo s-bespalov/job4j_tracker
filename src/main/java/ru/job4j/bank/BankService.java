@@ -7,6 +7,7 @@ import java.util.Map;
 
 /**
  * Класс описывает банковский сервис
+ *
  * @author Sergey Bespalov
  * @version 1.0
  */
@@ -18,6 +19,7 @@ public class BankService {
 
     /**
      * Метод добавляет нового пользователя
+     *
      * @param user пользователь для добавления
      */
     public void addUser(User user) {
@@ -26,6 +28,7 @@ public class BankService {
 
     /**
      * Удалить пользователя с указанным номером паспорта
+     *
      * @param passport номер паспорта удаляемого пользователя
      */
     public void deleteUser(String passport) {
@@ -34,8 +37,9 @@ public class BankService {
 
     /**
      * Добавить банковский счет пользователю
+     *
      * @param passport номер паспорта пользователя, которому будет добавлен счет
-     * @param account добавляемы счет
+     * @param account  добавляемы счет
      */
     public void addAccount(String passport, Account account) {
         User user = findByPassport(passport);
@@ -49,47 +53,43 @@ public class BankService {
 
     /**
      * Найти пользователя по номеру паспорта
+     *
      * @param passport номер паспорта
      * @return возвращает пользователя - объект класса {@link User}
      */
     public User findByPassport(String passport) {
-        User rsl = null;
-        for (User user : users.keySet()) {
-            if (passport.equals(user.getPassport())) {
-                rsl = user;
-                break;
-            }
-        }
-        return rsl;
+        return users.keySet()
+                .stream()
+                .filter(u -> passport.equals(u.getPassport()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * Найти счет по реквизитам
-     * @param passport номер паспорта пользователя, которому принадлежит счет
+     *
+     * @param passport  номер паспорта пользователя, которому принадлежит счет
      * @param requisite реквизиты банковского счета
      * @return возвращает банковский счет - объект класса {@link Account}
      */
     public Account findByRequisite(String passport, String requisite) {
-        Account rsl = null;
-        User user = findByPassport(passport);
-        if (user != null) {
-            for (Account account : users.get(user)) {
-                if (requisite.equals(account.getRequisite())) {
-                    rsl = account;
-                    break;
-                }
-            }
-        }
-        return rsl;
+        return users.entrySet()
+                .stream()
+                .filter(e -> passport.equals(e.getKey().getPassport()))
+                .flatMap(e -> e.getValue().stream())
+                .filter(a -> requisite.equals(a.getRequisite()))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
      * Перевод денег между пользователями
-     * @param srcPassport номер паспорта пользователя совершающего перевод
-     * @param srcRequisite реквизиты счета с которого производится перевод
-     * @param destPassport номер паспорта пользователя которому отправляется перевод
+     *
+     * @param srcPassport   номер паспорта пользователя совершающего перевод
+     * @param srcRequisite  реквизиты счета с которого производится перевод
+     * @param destPassport  номер паспорта пользователя которому отправляется перевод
      * @param destRequisite реквизиты счета на который отправляется перевод
-     * @param amount сумма, которая будет переведена
+     * @param amount        сумма, которая будет переведена
      * @return возвращает {@code true} если перевод прошел успешно, если произошла ошибка - {@code false}
      */
     public boolean transferMoney(String srcPassport, String srcRequisite,
@@ -109,6 +109,7 @@ public class BankService {
 
     /**
      * Получить список счетов пользователя
+     *
      * @param user объект класса {@link User}
      * @return возвращает список счетов пользователя - коллекцию типа {@link List}
      */
