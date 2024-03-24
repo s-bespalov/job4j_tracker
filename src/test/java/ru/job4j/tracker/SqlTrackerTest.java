@@ -5,14 +5,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.*;
+import org.h2.jdbcx.JdbcDataSource;
 
 class SqlTrackerTest {
 
@@ -20,17 +18,11 @@ class SqlTrackerTest {
 
     @BeforeAll
     public static void setupBeforeTests() throws Exception {
-        try (InputStream input = SqlTrackerTest.class.getClassLoader()
-                .getResourceAsStream("app.properties")) {
-            Properties config = new Properties();
-            config.load(input);
-            Class.forName(config.getProperty("test.driver-class-name"));
-            testConnection = DriverManager.getConnection(
-                    config.getProperty("test.url"),
-                    config.getProperty("test.username"),
-                    config.getProperty("test.password")
-            );
-        }
+        JdbcDataSource dataSource = new JdbcDataSource();
+        dataSource.setURL("jdbc:h2:mem:test");
+        dataSource.setUser("h2user");
+        dataSource.setPassword("h2user");
+        testConnection = dataSource.getConnection();
     }
 
     @BeforeEach
