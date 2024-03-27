@@ -2,57 +2,55 @@ package ru.job4j.tracker;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 
 import static org.assertj.core.api.Assertions.*;
-import org.h2.jdbcx.JdbcDataSource;
 
 class SqlTrackerTest {
 
-    private static Connection testConnection;
+    private static Connection connection;
 
     @BeforeAll
-    public static void setupBeforeTests() throws Exception {
-        JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:test");
-        dataSource.setUser("h2user");
-        dataSource.setPassword("h2user");
-        testConnection = dataSource.getConnection();
-    }
+    public static void initConnection() throws Exception {
+        try (InputStream in = SqlTracker.class.getClassLoader()
+                .getResourceAsStream("db/liquibase_test.properties")) {
+            Properties config = new Properties();
+            config.load(in);
+            Class.forName(config.getProperty("driver-class-name"));
+            connection = DriverManager.getConnection(
+                    config.getProperty("url"),
+                    config.getProperty("username"),
+                    config.getProperty("password")
 
-    @BeforeEach
-    public void setupTest() {
-        try (var statement = testConnection.createStatement()) {
-            statement.execute(
-                    "CREATE TABLE IF NOT EXISTS items (id serial primary key, name text, created timestamp);");
-        } catch (SQLException e) {
-            fail(e.getMessage());
-        }
-        try (var statement = testConnection.createStatement()) {
-            statement.execute(
-                    "DELETE FROM items;");
-        } catch (SQLException e) {
-            fail(e.getMessage());
+            );
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
         }
     }
 
     @AfterAll
-    public static void tearDownAfterTests() {
-        try {
-            testConnection.close();
-        } catch (SQLException e) {
-            fail(e.getMessage());
+    public static void tearDownAfterTests() throws SQLException {
+        connection.close();
+    }
+
+    @AfterEach
+    public void wipeTable() throws SQLException {
+        try (var statement = connection.prepareStatement("delete from items")) {
+            statement.execute();
         }
     }
 
     @Test
     public void whenAddNewItemThenTrackerHasSameItem() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item item = new Item();
         item.setName("test1");
         tracker.add(item);
@@ -62,7 +60,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenTestFindById() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item bug = new Item("Bug");
         Item item = tracker.add(bug);
         Item result = tracker.findById(item.getId());
@@ -71,7 +69,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenTestFindAll() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item first = new Item("First");
         Item second = new Item("Second");
         tracker.add(first);
@@ -82,7 +80,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenTestFindByNameCheckArrayLength() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item first = new Item("First");
         Item second = new Item("Second");
         tracker.add(first);
@@ -96,7 +94,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenTestFindByNameCheckSecondItemName() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item first = new Item("First");
         Item second = new Item("Second");
         tracker.add(first);
@@ -110,7 +108,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenReplaceItemIsSuccessful() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item item = new Item("Bug");
         tracker.add(item);
         int id = item.getId();
@@ -121,7 +119,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenReplaceItemIsNotSuccessful() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item item = new Item("Bug");
         tracker.add(item);
         Item updateItem = new Item("Bug with description");
@@ -132,7 +130,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenDeleteItemIsSuccessful() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item item = new Item("Bug");
         tracker.add(item);
         int id = item.getId();
@@ -142,7 +140,7 @@ class SqlTrackerTest {
 
     @Test
     public void whenDeleteItemIsNotSuccessful() {
-        Store tracker = new SqlTracker(testConnection);
+        Store tracker = new SqlTracker(connection);
         Item item = new Item("Bug");
         tracker.add(item);
         tracker.delete(1000);
