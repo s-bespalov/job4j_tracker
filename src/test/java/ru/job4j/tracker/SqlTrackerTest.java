@@ -19,7 +19,7 @@ class SqlTrackerTest {
     private static Connection connection;
 
     @BeforeAll
-    public static void initConnection() throws Exception {
+    public static void initConnection() {
         try (InputStream in = SqlTracker.class.getClassLoader()
                 .getResourceAsStream("db/liquibase_test.properties")) {
             Properties config = new Properties();
